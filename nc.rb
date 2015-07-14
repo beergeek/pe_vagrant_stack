@@ -123,7 +123,7 @@ def config_r10k(remote)
   result, report = Puppet::Resource.indirection.save(conf)
   puts "Resource: #{report.status}"
   puts report.logs
-  #system('/opt/puppet/bin/r10k deploy environment -v -p')
+  system('/opt/puppet/bin/r10k deploy environment -v -p')
   @classifier.update_classes.update
   update_master(remote)
 end

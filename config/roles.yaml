@@ -10,9 +10,6 @@ roles:
         - [modifyvm, !ruby/sym id, '--memory', 4096]
         - [modifyvm, !ruby/sym id, '--ioapic', 'on']
         - [modifyvm, !ruby/sym id, '--cpus', '2']
-    synced_folders:
-      - host_path:  '.files'
-        guest_path: '/var/puppet-files'
     provisioners:
       - type: shell
         inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
@@ -36,9 +33,6 @@ roles:
         - [modifyvm, !ruby/sym id, '--memory', 2048]
         - [modifyvm, !ruby/sym id, '--ioapic', 'on']
         - [modifyvm, !ruby/sym id, '--cpus', '1']
-    synced_folders:
-      - host_path:  '.files'
-        guest_path: '/var/puppet-files'
     provisioners:
       - type: shell
         inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
@@ -62,7 +56,4 @@ roles:
           mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
           echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
           curl -sk https://aio0.puppetlkabs.vm:8140/packages/current/install.bash | /bin/bash -s agent:server=puppet.puppetlabs.vm
-    synced_folders:
-      - host_path:  '.files'
-        guest_path: '/var/puppet-files'
   

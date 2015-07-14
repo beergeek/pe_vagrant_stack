@@ -1,0 +1,13 @@
+---
+vms:
+  - name: "aio0.puppetlabs.vm"
+    box:  "puppetlabs/centos-6.5-64-nocm"
+    roles: [ "mom" ]
+
+  - name: "com0.puppetlabs.vm"
+    box:  "puppetlabs/centos-6.5-64-nocm"
+    roles: [ "com" ]
+
+  - name: "node.puppetlabs.vm"
+    box: "puppetlabs/centos-6.5-64-nocm"
+    roles: [ "posix_agent" ]

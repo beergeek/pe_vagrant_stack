@@ -1,0 +1,68 @@
+---
+roles:
+  mom:
+    private_networks:
+      - ip: '0.0.0.0'
+        auto_network: true
+    provider:
+      type: virtualbox
+      customize:
+        - [modifyvm, !ruby/sym id, '--memory', 4096]
+        - [modifyvm, !ruby/sym id, '--ioapic', 'on']
+        - [modifyvm, !ruby/sym id, '--cpus', '2']
+    synced_folders:
+      - host_path:  '.files'
+        guest_path: '/var/puppet-files'
+    provisioners:
+      - type: shell
+        inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+      - type: hosts
+      - type: pe_bootstrap
+        role: !ruby/sym master
+        answer_file: answers.txt
+      - type: shell
+        inline: |-
+          /opt/puppet/bin/gem install puppetclassify --no-ri --no-rdoc
+          /vagrant/nc.rb
+          /opt/puppet/bin/puppet agent -t
+
+  com:
+    private_networks:
+      - ip: '0.0.0.0'
+        auto_network: true
+    provider:
+      type: virtualbox
+      customize:
+        - [modifyvm, !ruby/sym id, '--memory', 2048]
+        - [modifyvm, !ruby/sym id, '--ioapic', 'on']
+        - [modifyvm, !ruby/sym id, '--cpus', '1']
+    synced_folders:
+      - host_path:  '.files'
+        guest_path: '/var/puppet-files'
+    provisioners:
+      - type: shell
+        inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+      - type: hosts
+      - type: shell
+        inline: |-
+          echo "10.20.1.52 puppet.puppetlabs.vm puppet" >> /etc/hosts
+          mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
+          echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
+          curl -sk https://aio0.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash -s main:dns_alt_names=`hostname -s`,`hostname -f`,puppet,puppet.puppetlabs.vm
+
+  posix_agent:
+    private_networks:
+      - {ip: '0.0.0.0', auto_network: true}
+    provisioners:
+      - {type: shell, inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"}
+      - {type: hosts}
+      - type: shell
+        inline: |-
+          echo "10.20.1.52 puppet.puppetlabs.vm puppet" >> /etc/hosts
+          mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
+          echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
+          curl -sk https://aio0.puppetlkabs.vm:8140/packages/current/install.bash | /bin/bash -s agent:server=puppet.puppetlabs.vm
+    synced_folders:
+      - host_path:  '.files'
+        guest_path: '/var/puppet-files'
+  

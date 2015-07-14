@@ -1,4 +1,6 @@
 #!/opt/puppet/bin/ruby
+require 'r10k/action/deploy/environment'
+require 'r10k/action/runner'
 require 'puppet'
 require 'hiera'
 require 'facter'
@@ -123,7 +125,17 @@ def config_r10k(remote)
   result, report = Puppet::Resource.indirection.save(conf)
   puts "Resource: #{report.status}"
   puts report.logs
-  system('/opt/puppet/bin/r10k deploy environment -v -p')
+
+  options = {
+    :puppetfile => true,
+    :config     => '/etc/puppetlabs/r10k/r10k.yaml',
+    :loglevel   => 'info'
+  }
+  my_action = R10K::Action::Deploy::Environment
+
+  runner = R10K::Action::Runner.new(options, [], my_action)
+  runner.call
+  cputs "Finished r10k"
   @classifier.update_classes.update
   update_master(remote)
 end

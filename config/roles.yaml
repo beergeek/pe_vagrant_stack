@@ -55,5 +55,5 @@ roles:
           echo "10.20.1.52 puppet.puppetlabs.vm puppet" >> /etc/hosts
           mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
           echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
-          curl -sk https://aio0.puppetlkabs.vm:8140/packages/current/install.bash | /bin/bash -s agent:server=puppet.puppetlabs.vm
+          curl -sk https://aio0.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash -s agent:server=puppet.puppetlabs.vm
   

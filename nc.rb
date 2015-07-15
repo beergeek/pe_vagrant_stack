@@ -90,14 +90,7 @@ def update_master(remote)
 
   raise 'PE Master group missing!' if master_group.empty?
 
-  source = {
-    'mytest' => {
-      'remote' => remote,
-      'basedir' => '/etc/puppetlabs/puppet/environments'
-    }
-  }
-
-  group_hash = master_group.first.merge({"classes" => {"r10k" => {'configfile' => '/etc/puppetlabs/r10k/r10k.yaml', 'sources' => source}}})
+  group_hash = master_group.first.merge({"classes" => {"roles::mom" => {}}})
   groups.update_group(group_hash)
 end
 
@@ -108,7 +101,6 @@ def kill_firewall()
     :enable => false,
   })
   result, report = Puppet::Resource.indirection.save(fw)
-  puts "Resource: #{report.status}"
   puts report.logs
 end
 
@@ -123,7 +115,6 @@ def config_r10k(remote)
     :content => "cachedir: '/var/cache/r10k'\n\nsources:\n  test:\n    remote: '#{remote}'\n    basedir: '/etc/puppetlabs/puppet/environments'"
   })
   result, report = Puppet::Resource.indirection.save(conf)
-  puts "Resource: #{report.status}"
   puts report.logs
 
   options = {
@@ -147,6 +138,6 @@ end
 kill_firewall
 config_r10k('git://github.com/beergeek/puppet_env.git')
 node_add("PE ActiveMQ Broker","com0.puppetlabs.vm")
-node_add("PE Master","com0.puppetlabs.vm", false)
+#node_add("PE Master","com0.puppetlabs.vm", false)
 create_group("PE ActiveMQ Hub", '76926f43-be06-4ee9-ad69-08681d224c1a',{'puppet_enterprise::profile::amq::hub' => {}},'aio0.puppetlabs.vm','PE Infrastructure')
-create_group("PE COM Master", '76926f43-be06-4ee9-ad69-08681d224c1b',{'pe_repo' => {'master' => 'puppet.puppetlabs.vm' }},'com0.puppetlabs.vm',"PE Master")
+create_group("PE COM Master", '76926f43-be06-4ee9-ad69-08681d224c1b',{'pe_repo' => {'master' => 'puppet.puppetlabs.vm' },'role::com' => {}},'com0.puppetlabs.vm',"PE Infrastructure")

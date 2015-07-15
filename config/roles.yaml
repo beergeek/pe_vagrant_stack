@@ -20,10 +20,8 @@ roles:
       - type: shell
         inline: |-
           /opt/puppet/bin/gem install puppetclassify --no-ri --no-rdoc
-      - type: shell
-        path: nc.rb
-      - type: shell
-        inline: /opt/puppet/bin/puppet agent -t
+      #- type: shell
+      #  path: nc.rb
 
   com:
     private_networks:
@@ -41,21 +39,41 @@ roles:
       - type: hosts
       - type: shell
         inline: |-
-          echo "10.20.1.52 puppet.puppetlabs.vm puppet" >> /etc/hosts
+          echo "10.20.1.53 puppet.puppetlabs.vm puppet" >> /etc/hosts
           mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
           echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
-          curl -sk https://aio0.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash -s main:dns_alt_names=`hostname -s`,`hostname -f`,puppet,puppet.puppetlabs.vm
+          curl -sk https://aio0.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash -s main:dns_alt_names=`hostname -s`,`hostname -f`,puppet,puppet.puppetlabs.vm main:environmentpath=/etc/puppetlabs/puppet/environments
+
+  lb:
+    private_networks:
+      - ip: '0.0.0.0'
+        auto_network: true
+    provider:
+      type: virtualbox
+    provisioners:
+      - type: shell
+        inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+      - type: hosts
+      - type: shell
+        inline: |-
+          echo "10.20.1.53 puppet.puppetlabs.vm puppet" >> /etc/hosts
+          mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
+          echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
+          curl -sk https://aio0.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash`
 
   posix_agent:
     private_networks:
       - {ip: '0.0.0.0', auto_network: true}
+    provider:
+      type: virtualbox
     provisioners:
-      - {type: shell, inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"}
-      - {type: hosts}
+      - type: shell
+        inline: "echo 'nameserver 8.8.8.8' > /etc/resolv.conf"
+      - type: hosts
       - type: shell
         inline: |-
-          echo "10.20.1.52 puppet.puppetlabs.vm puppet" >> /etc/hosts
+          echo "10.20.1.53 puppet.puppetlabs.vm puppet" >> /etc/hosts
           mkdir -p /etc/puppetlabs/{facter/facts.d,puppet}
           echo "data_centre=sydney" >> /etc/puppetlabs/facter/facts.d/data_centre.txt
-          curl -sk https://aio0.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash -s agent:server=puppet.puppetlabs.vm
+          curl -sk https://puppet.puppetlabs.vm:8140/packages/current/install.bash | /bin/bash -s agent:server=puppet.puppetlabs.vm
   

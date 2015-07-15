@@ -20,8 +20,10 @@ roles:
       - type: shell
         inline: |-
           /opt/puppet/bin/gem install puppetclassify --no-ri --no-rdoc
-          /vagrant/nc.rb
-          /opt/puppet/bin/puppet agent -t
+      - type: shell
+        path: nc.rb
+      - type: shell
+        inline: /opt/puppet/bin/puppet agent -t
 
   com:
     private_networks:
